@@ -52,7 +52,7 @@ namespace spiridonov
 
       ++size_;
     }
-      
+
     const T& getTop() const
     {
       if (isEmpty())
@@ -62,7 +62,7 @@ namespace spiridonov
 
       return head_->data_;
     }
-      
+
     T& getTop()
     {
       if (isEmpty())
@@ -98,12 +98,12 @@ namespace spiridonov
 
       --size_;
     }
-      
+
     bool isEmpty() const
     {
       return head_ == nullptr;
     }
-      
+
     void clear()
     {
       while (head_)

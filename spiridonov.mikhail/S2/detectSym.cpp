@@ -13,7 +13,7 @@ bool isNumber(const std::string& s)
   {
     return false;
   }
-  
+
   for (char ch : s)
   {
     if (!isdigit(ch))
@@ -21,10 +21,9 @@ bool isNumber(const std::string& s)
       return false;
     }
   }
-  
+
   return true;
 }
-
 
 bool isOp(const std::string& s)
 {
@@ -60,7 +59,6 @@ size_t evalPriority(char op)
     };
     return priority;
 }
-
 
 bool priorityEqualOrGreater(char op1, char op2)
 {
@@ -127,7 +125,7 @@ int opDiv(int a, int b)
   {
     throw std::runtime_error("Division by zero");
   }
-  
+
   return a / b;
 }
 

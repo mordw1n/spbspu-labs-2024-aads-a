@@ -88,7 +88,7 @@ namespace spiridonov
       head_ = nullptr;
       size_ = 0;
     }
-      
+
     size_t getSize() const
     {
       return size_;
