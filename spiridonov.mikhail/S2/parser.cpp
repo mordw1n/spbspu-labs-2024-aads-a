@@ -2,11 +2,10 @@
 
 namespace spiridonov
 {
-  int Parser::parseExpression(const std::string& expression)
+  int64_t Parser::parseExpression(const std::string& expression)
   {
-    Stack<int> operands;
+    Stack<int64_t> operands;
     Stack<char> operators;
-
     std::string numString;
 
     for (char ch : expression)
@@ -15,7 +14,7 @@ namespace spiridonov
       {
         if (!numString.empty())
         {
-          operands.push(std::stoi(numString));
+          operands.push(std::stoll(numString));
           numString.clear();
         }
         continue;
@@ -48,11 +47,11 @@ namespace spiridonov
       {
         if (!numString.empty())
         {
-          operands.push(std::stoi(numString));
+          operands.push(std::stoll(numString));
           numString.clear();
         }
 
-        while (!operators.isEmpty() && priorityEqualOrGreater(operators.getTop(), ch))
+        while (!operators.isEmpty() && operators.getTop() != '(' && priorityEqualOrGreater(operators.getTop(), ch))
         {
           applyOperation(operands, operators.getTop());
           operators.pop();
@@ -67,7 +66,7 @@ namespace spiridonov
 
     if (!numString.empty())
     {
-      operands.push(std::stoi(numString));
+      operands.push(std::stoll(numString));
     }
 
     while (!operators.isEmpty())
@@ -80,9 +79,9 @@ namespace spiridonov
         throw std::runtime_error("Invalid expression");
       }
 
-      int b = operands.getTop();
+      int64_t b = operands.getTop();
       operands.pop();
-      int a = operands.getTop();
+      int64_t a = operands.getTop();
       operands.pop();
 
       switch (op)
@@ -115,15 +114,15 @@ namespace spiridonov
     return operands.getTop();
   }
 
-  void Parser::applyOperation(Stack<int>& operands, char op)
+  void Parser::applyOperation(Stack<int64_t>& operands, char op)
   {
     if (operands.getSize() < 2)
     {
       throw std::runtime_error("Invalid expression");
     }
-    int b = operands.getTop();
+    int64_t b = operands.getTop();
     operands.pop();
-    int a = operands.getTop();
+    int64_t a = operands.getTop();
     operands.pop();
 
     switch (op)
