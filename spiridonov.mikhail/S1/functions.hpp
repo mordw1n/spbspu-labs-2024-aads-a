@@ -4,9 +4,10 @@
 #include <climits>
 #include <iostream>
 
+
 namespace spiridonov
 {
-  using nameList = std::pair<std::string, List< size_t >>;
+  using nameList = std::pair<std::string, List< int >>;
 
   nameList inputLine(std::istream& in)
   {
@@ -20,7 +21,7 @@ namespace spiridonov
     size_t inNum = 0;
     while (in >> inNum)
     {
-      if (inNum > INT_MAX)
+      if (inNum > std::numeric_limits< int >::max())
       {
         throw std::overflow_error("Error: overflow");
       }
@@ -48,7 +49,7 @@ namespace spiridonov
     {
       throw std::invalid_argument("Name is empty");
     }
-    catch (std::overflow_error &)
+    catch (std::overflow_error&)
     {
       throw std::overflow_error("Error: overflow");
     }
