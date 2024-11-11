@@ -1,13 +1,23 @@
 #ifndef FUNCTIONS_HPP
 #define FUNCTIONS_HPP
 #include "forward_list.hpp"
-#include <algorithm>
 #include <limits>
+#include <algorithm>
 #include <iostream>
 
 namespace spiridonov
 {
   using nameList = std::pair<std::string, List< size_t >>;
+  bool flagBigNum = false;
+
+  void handleLargeNumber()
+  {
+    if (flagBigNum)
+    {
+      std::cerr << "Error: overflow";
+      exit(1);
+    }
+  }
 
   nameList inputLine(std::istream& in)
   {
@@ -19,11 +29,13 @@ namespace spiridonov
     }
 
     size_t inNum = 0;
+
     while (in >> inNum)
     {
       if (inNum >= std::numeric_limits< size_t >::max())
       {
-        throw std::overflow_error("Error: overflow");
+        flagBigNum = true;
+        break;
       }
       result.second.push_back(inNum);
     }
@@ -45,14 +57,11 @@ namespace spiridonov
         }
       }
     }
-    catch (std::invalid_argument&)
+    catch (const std::invalid_argument&)
     {
       throw std::invalid_argument("Name is empty");
     }
-    catch (std::overflow_error&)
-    {
-      throw std::overflow_error("Error: overflow");
-    }
+
     return Lists;
   }
 
@@ -68,6 +77,7 @@ namespace spiridonov
       }
     }
     std::cout << '\n';
+    handleLargeNumber();
   }
 
   template <typename T>
