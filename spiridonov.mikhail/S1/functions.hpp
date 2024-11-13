@@ -8,22 +8,12 @@
 namespace spiridonov
 {
   using nameList = std::pair<std::string, List< size_t >>;
-  bool flagBigNum = false;
-
-  void handleLargeNumber()
-  {
-    if (flagBigNum)
-    {
-      std::cerr << "Error: overflow";
-      exit(1);
-    }
-  }
 
   nameList inputLine(std::istream& in)
   {
     nameList result;
     in >> result.first;
-    if (result.first == "")
+    if (result.first.empty())
     {
       throw std::invalid_argument("Name is empty");
     }
@@ -32,11 +22,6 @@ namespace spiridonov
 
     while (in >> inNum)
     {
-      if (inNum >= std::numeric_limits< size_t >::max())
-      {
-        flagBigNum = true;
-        break;
-      }
       result.second.push_back(inNum);
     }
 
@@ -77,20 +62,24 @@ namespace spiridonov
       }
     }
     std::cout << '\n';
-    handleLargeNumber();
   }
 
   template <typename T>
   T sumListValues(const List<T>& list)
   {
+    size_t max_ULL = std::numeric_limits<size_t>::max();
+
     T sum = 0;
     for (auto it = list.begin(); it != list.end(); ++it)
     {
       sum += *it;
+      if (max_ULL - sum <= *it)
+      {
+        throw std::overflow_error("Error: overflow");
+      }
     }
     return sum;
   }
-
 }
 
 #endif
