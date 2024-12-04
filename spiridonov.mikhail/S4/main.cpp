@@ -1,6 +1,8 @@
 #include <iostream>
-#include "BSTree.hpp"
+#include <string>
+#include "AVLtree.hpp"
 #include "t_node.hpp"
+#include "commands.hpp"
 
 int main(int argc, char *argv[])
 {
