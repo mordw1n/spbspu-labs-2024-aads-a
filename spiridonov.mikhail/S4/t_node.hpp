@@ -1,60 +1,37 @@
-#ifndef TNODE_H
-#define TNODE_H
+#ifndef TREENODE_H
+#define TREENODE_H
+
+#include <utility>
 
 namespace spiridonov
 {
-  template < class Key, class Value >
-
-  struct TNode
+  namespace detail
   {
-  private:
-    using tnode_t = TNode< Key, Value >;
+    template < class Key, class Value >
 
-    std::pair< Key, Value > data_;
-    TNode< Key, Value > * parent_;
-    TNode< Key, Value > * left_;
-    TNode< Key, Value > * right_;
-
-    TNode(Key key_, Value value_, TNode< Key, Value >* root_ = nullptr):
-      data_(key_, value_),
-      parent_(root_),
-      left_(nullptr),
-      right_(nullptr)
-    {}
-
-    void insert(spiridonov::TNode < Key, Value >* node_, Key key_, Value value_)
+    struct TNode
     {
-      if (key_ < node_->data_.first)
-      {
-        if (node_->left_ == nullptr)
-        {
-          node_->left_ = new TNode< Key, Value >(key_, value_, node_);
-        }
-        else
-        {
-          insert(node_->left_, key_, value_);
-        }
-      }
+      using KV_tnode_t = TNode< Key, Value >;
 
-      else if (key_ >= node_->data_.first)
-      {
-        if (node_->right_ == nullptr)
-        {
-          node_->right_ = new TNode< Key, Value >(key_, value_, node_);
-        }
-        else
-        {
-          insert(node_->right_, key_, value_);
-        }
-      }
+      std::pair< Key, Value > data_;
+      KV_tnode_t *parent_;
+      KV_tnode_t *left_;
+      KV_tnode_t *right_;
+      int height_;
 
-    }
-    void insert(Key key_, Value value_)
-    {
-      insert(this, key_, value_);
-    }
+      TNode(Key key_, Value value_, KV_tnode_t *parent = nullptr):
+        data_(key_, value_),
+        parent_(parent),
+        left_(nullptr),
+        right_(nullptr),
+        height_(0)
+      {}
 
-  };
+      ~TNode()
+      {}
+
+    };
+  }
 }
 
 #endif

@@ -1,17 +1,20 @@
-#ifndef CMD_HPP
-#define CMD_HPP
+#ifndef COMMANDS_HPP
+#define COMMANDS_HPP
 
-#include <iostream>
+/*#include <iostream>
 #include <string>
-#include "BSTree.hpp"
+#include "AVLtree.hpp"
 
 namespace spiridonov
 {
-  void print_f();
-  void complement_f();
-  void intersect_f();
-  void union_f();
+  using dict = AVLtree< int, std::string >;
+
+  void read_dict();
+  void print_dict();
+  void complement_dict();
+  void intersect_dict();
+  void union_dict();
 
 }
-
+*/
 #endif
