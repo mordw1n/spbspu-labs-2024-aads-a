@@ -1,6 +1,7 @@
 #ifndef ITERATOR_HPP
 #define ITERATOR_HPP
 
+#include <cassert>
 #include "t_node.hpp"
 #include "const_iterator.hpp"
 
@@ -48,33 +49,87 @@ namespace spiridonov
     iter & operator++()
     {
       assert(node_ptr_ != nullptr);
-      if (node_->right)
+      if (node_ptr_->right)
       {
-        node_ = node_->right_;
-        while (node_->left_)
+        node_ptr_ = node_ptr_->right;
+        while (node_ptr_->left)
         {
-          node_ = node_->left_;
+          node_ptr_ = node_ptr_->left;
         }
-        return *this;
       }
+      else
+      {
+        while (node_ptr_->parent && node_ptr_ == node_ptr_->parent->right)
+        {
+          node_ptr_ = node_ptr_->parent;
+        }
+        node_ptr_ = node_ptr_->parent;
+      }
+      return *this;
     }
 
     iter & operator++(int)
     {
-      assert(node_ptr_ != nullptr);
+      iter temp = *this;
+      ++(*this);
+      return temp;
     }
 
     iter & operator--()
     {
       assert(node_ptr_ != nullptr);
+      if (node_ptr_->left)
+      {
+        node_ptr_ = node_ptr_->left;
+        while (node_ptr_->right)
+        {
+          node_ptr_ = node_ptr_->right;
+        }
+      }
+      else
+      {
+        while (node_ptr_->parent && node_ptr_ == node_ptr_->parent->left)
+        {
+          node_ptr_ = node_ptr_->parent;
+        }
+        node_ptr_ = node_ptr_->parent;
+      }
+      return *this;
     }
 
     iter & operator--(int)
     {
-      assert(node_ptr_ != nullptr);
+      iter temp = *this;
+      --(*this);
+      return temp;
     }
-  };
 
+    bool operator==(const iter & other) const
+    {
+      return node_ptr_ == other.node_;
+    }
+
+    bool operator==(const_iter & other) const
+    {
+      return node_ptr_ == other.node_;
+    }
+
+    bool operator!=(const iter& other) const
+    {
+      return node_ptr_ != other.node_;
+    }
+
+    bool operator!=(const_iter& other) const
+    {
+      return node_ptr_ != other.node_;
+    }
+
+  private:
+    KV_node * node_;
+    explicit IterT(KV_node* node):
+      node_(node)
+    {}
+  };
 }
 
 #endif

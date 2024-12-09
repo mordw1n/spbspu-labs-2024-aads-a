@@ -10,12 +10,6 @@ namespace spiridonov
   template< class Key, class Value, class Compare = std::less< Key > >
   class AVLtree
   {
-  //public:
-    //AVLtree();
-    //AVLtree(const AVLtree& other);
-    //AVLtree(AVLtree&& other) noexcept;
-    //~AVLtree();
-
   public:
     using KV_tnode = detail::TNode< Key, Value >;
     using KVC_AVLtree = AVLtree< Key, Value, Compare >;
@@ -24,24 +18,12 @@ namespace spiridonov
     KV_tnode* root_;
     Compare comp_;
 
-    //KV_tnode* insert(KV_tnode* root_, const Key& key_, const Value& value_);
-    //KV_tnode* erase(KVC_AVLtree* root_, const Key& key_);
-    //KV_tnode* search(KVC_AVLtree* root_, const Key& key_);
-    //   KV_tnode* search(KVC_AVLtree* root_, const Key& key_, const Value& value_);
-    //KV_tnode* balance(KVC_AVLtree* root_);
-
-    //void clear();
-    //int height(KV_tnode* root_);
-    //int balance_factor(KV_tnode* root_);
-
-    //template< typename Key, typename Value, typename Compare >
     AVLtree():
       size_(0),
       root_(nullptr),
       comp_(Compare())
     {}
 
-    //template< typename Key, typename Value, typename Compare >
     AVLtree(const AVLtree& other):
       size_(0),
       root_(nullptr),
@@ -61,7 +43,6 @@ namespace spiridonov
       }
     }
 
-    //template< typename Key, typename Value, typename Compare >
     AVLtree(AVLtree&& other) noexcept:
       size_(other.size_),
       root_(other.root_),
@@ -76,7 +57,6 @@ namespace spiridonov
       clear();
     }
 
-    //template< typename Key, typename Value, typename Compare >
     void clear()
     {
       while (root_ != nullptr)
@@ -126,7 +106,6 @@ namespace spiridonov
       return rotation_LL(root_);
     }
 
-    //template< typename Key, typename Value, typename Compare >
     KV_tnode* insert(KV_tnode* root_, const Key& key_, const Value& value_)
     {
       if (root_ == nullptr)
@@ -161,12 +140,9 @@ namespace spiridonov
       {
         root_->data_.second = value_;
       }
-
-      balance(root_);
-      return root_;
+      return balance(root_);
     }
 
-    //template< typename Key, typename Value, typename Compare >
     KVC_AVLtree* search(KVC_AVLtree* root_, const Key& key_)
     {
       if (root_ == nullptr || root_->data_.first == key_)
@@ -180,7 +156,6 @@ namespace spiridonov
       return search(root_->right_, key_);
     }
 
-    //template< typename Key, typename Value, typename Compare >
     KVC_AVLtree* erase(KVC_AVLtree* root_, const Key& key_)
     {
       if (root_ == nullptr)
@@ -218,7 +193,6 @@ namespace spiridonov
       return balance(root_);
     }
 
-    //template<typename Key, typename Value, typename Compare>
     int height(KV_tnode* node)
     {
       if (node == nullptr)
@@ -230,8 +204,6 @@ namespace spiridonov
       return std::max(left_height, right_height) + 1;
     }
 
-
-    //template< typename Key, typename Value, typename Compare >
     KVC_AVLtree* balance(KVC_AVLtree* root_)
     {
       if (root_ == nullptr)
@@ -262,29 +234,8 @@ namespace spiridonov
       {
         return rotation_RL(root_);
       }
-
       return root_;
     }
-
-    /* template< typename Key, typename Value, typename Compare >
-    KVC_AVLtree* leftmost(KVC_AVLtree* root_)
-    {
-      while (root_ && root_->left_ != nullptr)
-      {
-        root_ = root_->left_;
-      }
-      return root_;
-    }
-
-    KVC_AVLtree* rightmost(KVC_AVLtree* root_)
-    {
-      while (root_ && root_->right_ != nullptr)
-      {
-        root_ = root_->rightmost;
-      }
-      return root_;
-    }
-    */
   };
 }
 

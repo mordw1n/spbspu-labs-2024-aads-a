@@ -19,7 +19,7 @@ namespace spiridonov
       KV_node *right_;
       int height_;
 
-      TNode(Key key_, Value value_, KV_tnode_t *parent = nullptr):
+      TNode(Key key_, Value value_, KV_node *parent = nullptr):
         data_(key_, value_),
         parent_(parent),
         left_(nullptr),
