@@ -8,15 +8,15 @@
 namespace spiridonov
 {
   template< class Key, class Value, class Compare = std::less< Key > >
-  struct AVLtree
+  class AVLtree
   {
-  public:
-    AVLtree();
-    AVLtree(const AVLtree& other);
-    AVLtree(AVLtree&& other) noexcept;
+  //public:
+    //AVLtree();
+    //AVLtree(const AVLtree& other);
+    //AVLtree(AVLtree&& other) noexcept;
     //~AVLtree();
 
-  private:
+  public:
     using KV_tnode = detail::TNode< Key, Value >;
     using KVC_AVLtree = AVLtree< Key, Value, Compare >;
 
@@ -24,23 +24,24 @@ namespace spiridonov
     KV_tnode* root_;
     Compare comp_;
 
-    KV_tnode* insert(KV_tnode* root_, const Key& key_, const Value& value_);
-    KV_tnode* erase(KV_tnode* node_, const Key& key_);
-    KV_tnode* search(KV_tnode* node_, const Key& key_, const Value& value_);
-    KV_tnode* balance(KV_tnode* root_);
+    //KV_tnode* insert(KV_tnode* root_, const Key& key_, const Value& value_);
+    //KV_tnode* erase(KVC_AVLtree* root_, const Key& key_);
+    //KV_tnode* search(KVC_AVLtree* root_, const Key& key_);
+    //   KV_tnode* search(KVC_AVLtree* root_, const Key& key_, const Value& value_);
+    //KV_tnode* balance(KVC_AVLtree* root_);
 
-    void clear();
-    int height(KV_tnode* root_);
-    int get_balance_f(KV_tnode* root_);
+    //void clear();
+    //int height(KV_tnode* root_);
+    //int balance_factor(KV_tnode* root_);
 
-    template< typename Key, typename Value, typename Compare >
+    //template< typename Key, typename Value, typename Compare >
     AVLtree():
       size_(0),
       root_(nullptr),
       comp_(Compare())
     {}
 
-    template< typename Key, typename Value, typename Compare >
+    //template< typename Key, typename Value, typename Compare >
     AVLtree(const AVLtree& other):
       size_(0),
       root_(nullptr),
@@ -50,7 +51,7 @@ namespace spiridonov
       {
         for (auto it = other.cbegin(); it != other.cend(); ++it)
         {
-          push(it->first, it->second);
+          insert(it->first, it->second);
         }
       }
       catch (...)
@@ -60,7 +61,7 @@ namespace spiridonov
       }
     }
 
-    template< typename Key, typename Value, typename Compare >
+    //template< typename Key, typename Value, typename Compare >
     AVLtree(AVLtree&& other) noexcept:
       size_(other.size_),
       root_(other.root_),
@@ -75,7 +76,7 @@ namespace spiridonov
       clear();
     }
 
-    template< typename Key, typename Value, typename Compare >
+    //template< typename Key, typename Value, typename Compare >
     void clear()
     {
       while (root_ != nullptr)
@@ -85,7 +86,7 @@ namespace spiridonov
       size_ = 0;
     }
 
-    KV_tnode* rotation_R(KV_tnode* root_)
+    KV_tnode* rotation_RR(KV_tnode* root_)
     {
       KV_tnode* new_root = root_->left_;
       root_->left_ = new_root->right_;
@@ -99,7 +100,7 @@ namespace spiridonov
       return new_root;
     }
 
-    KV_tnode* rotation_L(KV_tnode* root_)
+    KV_tnode* rotation_LL(KV_tnode* root_)
     {
       KV_tnode* new_root = root_->right_;
       root_->right_ = new_root->left_;
@@ -115,17 +116,17 @@ namespace spiridonov
 
     KV_tnode* rotation_LR(KV_tnode* root_)
     {
-      root_->left_ = rotation_L(root_->left_);
-      return rotation_R(root_);
+      root_->left_ = rotation_LL(root_->left_);
+      return rotation_RR(root_);
     }
 
     KV_tnode* rotation_RL(KV_tnode* root_)
     {
-      root_->right_ = rotation_R(root_->right_);
-      return rotation_L(root_);
+      root_->right_ = rotation_RR(root_->right_);
+      return rotation_LL(root_);
     }
 
-    template< typename Key, typename Value, typename Compare >
+    //template< typename Key, typename Value, typename Compare >
     KV_tnode* insert(KV_tnode* root_, const Key& key_, const Value& value_)
     {
       if (root_ == nullptr)
@@ -165,6 +166,7 @@ namespace spiridonov
       return root_;
     }
 
+    //template< typename Key, typename Value, typename Compare >
     KVC_AVLtree* search(KVC_AVLtree* root_, const Key& key_)
     {
       if (root_ == nullptr || root_->data_.first == key_)
@@ -178,6 +180,7 @@ namespace spiridonov
       return search(root_->right_, key_);
     }
 
+    //template< typename Key, typename Value, typename Compare >
     KVC_AVLtree* erase(KVC_AVLtree* root_, const Key& key_)
     {
       if (root_ == nullptr)
@@ -212,10 +215,58 @@ namespace spiridonov
         root_->data_ = temp->data_;
         root_->right_ = erase(root_->right_, temp->data_.first);
       }
-      //return balance(root_);
+      return balance(root_);
+    }
+
+    //template<typename Key, typename Value, typename Compare>
+    int height(KV_tnode* node)
+    {
+      if (node == nullptr)
+      {
+        return 0;
+      }
+      int left_height = height(node->left_);
+      int right_height = height(node->right_);
+      return std::max(left_height, right_height) + 1;
+    }
+
+
+    //template< typename Key, typename Value, typename Compare >
+    KVC_AVLtree* balance(KVC_AVLtree* root_)
+    {
+      if (root_ == nullptr)
+      {
+        return nullptr;
+      }
+
+      int left_height = height(root_->left_);
+      int right_height = height(root_->right_);
+      int balance_factor = left_height - right_height;
+
+      if (balance_factor > 1 && height(root_->left_->left_) >= height(root_->left_->right_))
+      {
+        return rotation_RR(root_);
+      }
+
+      if (balance_factor > 1 && height(root_->left_->left_) < height(root_->left_->right_))
+      {
+        return rotation_LR(root_);
+      }
+
+      if (balance_factor < -1 && height(root_->right_->right_) >= height(root_->right_->left_))
+      {
+        return rotation_LL(root_);
+      }
+
+      if (balance_factor < -1 && height(root_->right_->right_) < height(root_->right_->left_))
+      {
+        return rotation_RL(root_);
+      }
+
       return root_;
     }
 
+    /* template< typename Key, typename Value, typename Compare >
     KVC_AVLtree* leftmost(KVC_AVLtree* root_)
     {
       while (root_ && root_->left_ != nullptr)
@@ -233,7 +284,7 @@ namespace spiridonov
       }
       return root_;
     }
-
+    */
   };
 }
 
