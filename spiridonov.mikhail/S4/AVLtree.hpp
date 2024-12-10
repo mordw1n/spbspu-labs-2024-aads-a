@@ -48,6 +48,42 @@ namespace spiridonov
       root_(other.root_)
     {
       other.root_ = nullptr;
+      other.size_ = 0;
+    }
+
+    AVLtree & operator=(const AVLtree & other)
+    {
+      if (this != &other)
+      {
+        clear();
+        size_ = 0;
+        try
+        {
+          for (auto it = other.cbegin(); it != other.cend(); ++it)
+          {
+            insert(it->first, it->second);
+          }
+        }
+        catch (...)
+        {
+          clear();
+          throw;
+        }
+      }
+      return *this;
+    }
+
+    AVLtree & operator=(AVLtree && other) noexcept
+    {
+      if (this != &other)
+      {
+        clear();
+        root_ = other.root_;
+        size_ = other.size_;
+        other.root_ = nullptr;
+        other.size_ = 0;
+      }
+      return *this;
     }
 
     ~AVLtree()

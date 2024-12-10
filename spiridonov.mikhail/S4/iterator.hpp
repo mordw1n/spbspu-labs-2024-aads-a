@@ -35,13 +35,13 @@ namespace spiridonov
     IterT(iter && other) noexcept = default;
     iter & operator=(iter && other) noexcept = default;
 
-    KV_pair & operator*()
+    const KV_pair & operator*() const
     {
       assert(node_ptr_ != nullptr);
       return node_ptr_->data_;
     }
 
-    KV_pair * operator->()
+    const KV_pair * operator->() const
     {
       assert(node_ptr_ != nullptr);
       return std::addressof(node_ptr_->data_);
@@ -117,12 +117,12 @@ namespace spiridonov
       return node_ptr_ == other.node_ptr_;
     }
 
-    bool operator!=(const iter& other) const
+    bool operator!=(const iter & other) const
     {
       return node_ptr_ != other.node_ptr_;
     }
 
-    bool operator!=(const_iter& other) const
+    bool operator!=(const_iter & other) const
     {
       return node_ptr_ != other.node_ptr_;
     }

@@ -33,13 +33,13 @@ namespace spiridonov
     ConstIterT(const_iter && other) noexcept = default;
     const_iter & operator=(const_iter && other) noexcept = default;
 
-    KV_pair & operator*()
+    const KV_pair & operator*() const
     {
       assert(node_ptr_ != nullptr);
       return node_ptr_->data_;
     }
 
-    KV_pair * operator->()
+    const KV_pair * operator->() const
     {
       assert(node_ptr_ != nullptr);
       return std::addressof(node_ptr_->data_);
@@ -48,21 +48,21 @@ namespace spiridonov
     const_iter & operator++()
     {
       assert(node_ptr_ != nullptr);
-      if (node_ptr_->right)
+      if (node_ptr_->right_)
       {
-        node_ptr_ = node_ptr_->right;
-        while (node_ptr_->left)
+        node_ptr_ = node_ptr_->right_;
+        while (node_ptr_->left_)
         {
-          node_ptr_ = node_ptr_->left;
+          node_ptr_ = node_ptr_->left_;
         }
       }
       else
       {
-        while (node_ptr_->parent && node_ptr_ == node_ptr_->parent->right)
+        while (node_ptr_->parent_ && node_ptr_ == node_ptr_->parent_->right_)
         {
-          node_ptr_ = node_ptr_->parent;
+          node_ptr_ = node_ptr_->parent_;
         }
-        node_ptr_ = node_ptr_->parent;
+        node_ptr_ = node_ptr_->parent_;
       }
       return *this;
     }
@@ -78,21 +78,21 @@ namespace spiridonov
     const_iter & operator--()
     {
       assert(node_ptr_ != nullptr);
-      if (node_ptr_->left)
+      if (node_ptr_->left_)
       {
-        node_ptr_ = node_ptr_->left;
-        while (node_ptr_->right)
+        node_ptr_ = node_ptr_->left_;
+        while (node_ptr_->right_)
         {
-          node_ptr_ = node_ptr_->right;
+          node_ptr_ = node_ptr_->right_;
         }
       }
       else
       {
-        while (node_ptr_->parent && node_ptr_ == node_ptr_->parent->left)
+        while (node_ptr_->parent_ && node_ptr_ == node_ptr_->parent_->left_)
         {
-          node_ptr_ = node_ptr_->parent;
+          node_ptr_ = node_ptr_->parent_;
         }
-        node_ptr_ = node_ptr_->parent;
+        node_ptr_ = node_ptr_->parent_;
       }
       return *this;
     }
@@ -107,22 +107,22 @@ namespace spiridonov
 
     bool operator==(const const_iter & other) const
     {
-      return node_ptr_ == other.node_;
+      return node_ptr_ == other.node_ptr_;
     }
 
     bool operator==(iter & other) const
     {
-      return node_ptr_ == other.node_;
+      return node_ptr_ == other.node_ptr_;
     }
 
     bool operator!=(const const_iter & other) const
     {
-      return node_ptr_ != other.node_;
+      return node_ptr_ != other.node_ptr_;
     }
 
     bool operator!=(iter & other) const
     {
-      return node_ptr_ != other.node_;
+      return node_ptr_ != other.node_ptr_;
     }
 
   private:
