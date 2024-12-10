@@ -42,7 +42,7 @@ namespace spiridonov
     KV_pair * operator->()
     {
       assert(node_ptr_ != nullptr);
-      return std::addressof(node_ptr_->data_)
+      return std::addressof(node_ptr_->data_);
     }
 
     const_iter & operator++()
@@ -69,6 +69,7 @@ namespace spiridonov
 
     const_iter & operator++(int)
     {
+      assert(node_ptr_ != nullptr);
       iter temp = *this;
       ++(*this);
       return temp;
@@ -98,6 +99,7 @@ namespace spiridonov
 
     const_iter & operator--(int)
     {
+      assert(node_ptr_ != nullptr);
       const_iter temp = *this;
       --(*this);
       return temp;
@@ -124,9 +126,9 @@ namespace spiridonov
     }
 
   private:
-    const KV_node * node_;
-    explicit ConstIterT(KV_node* node):
-      node_(node)
+    const KV_node * node_ptr_;
+    explicit ConstIterT(KV_node * node):
+      node_ptr_(node)
     {}
   };
 }

@@ -4,6 +4,8 @@
 #include <algorithm>
 #include <iostream>
 #include "t_node.hpp"
+#include "iterator.hpp"
+#include "const_iterator.hpp"
 
 namespace spiridonov
 {
@@ -11,23 +13,22 @@ namespace spiridonov
   class AVLtree
   {
   public:
-    using KV_tnode = detail::TNode< Key, Value >;
+    using KV_node = detail::TNode< Key, Value >;
     using KVC_AVLtree = AVLtree< Key, Value, Compare >;
+    using iter = IterT< Key, Value, Compare >;
+    using const_iter = ConstIterT< Key, Value, Compare >;
 
+    KV_node * root_;
     size_t size_;
-    KV_tnode* root_;
-    Compare comp_;
 
     AVLtree():
-      size_(0),
       root_(nullptr),
-      comp_(Compare())
+      size_(0)
     {}
 
-    AVLtree(const AVLtree& other):
-      size_(0),
+    AVLtree(const AVLtree & other):
       root_(nullptr),
-      comp_(other.comp_)
+      size_(0)
     {
       try
       {
@@ -43,12 +44,9 @@ namespace spiridonov
       }
     }
 
-    AVLtree(AVLtree&& other) noexcept:
-      size_(other.size_),
-      root_(other.root_),
-      comp_(other.comp_)
+    AVLtree(AVLtree && other) noexcept:
+      root_(other.root_)
     {
-      other.size_ = 0;
       other.root_ = nullptr;
     }
 
@@ -56,6 +54,40 @@ namespace spiridonov
     {
       clear();
     }
+
+    void insert(const Key& key, const Value value)
+    {
+      root_ = insert(root_, key, value);
+    }
+
+    KV_node * erase(const Key& key)
+    {
+      root_ = erase(root_, key);
+      return root_;
+    }
+
+    iter begin()
+    {
+      return iter(leftmost(root_));
+    }
+
+    iter end()
+    {
+      return iter(nullptr);
+    }
+
+    const_iter cbegin() const
+    {
+      return const_iter(leftmost(root_));
+    }
+
+    const_iter cend() const
+    {
+      return const_iter(nullptr);
+    }
+
+  private:
+    Compare comp_;
 
     void clear()
     {
@@ -66,9 +98,9 @@ namespace spiridonov
       size_ = 0;
     }
 
-    KV_tnode* rotation_RR(KV_tnode* root_)
+    KV_node * rotation_RR(KV_node * root_)
     {
-      KV_tnode* new_root = root_->left_;
+      KV_node * new_root = root_->left_;
       root_->left_ = new_root->right_;
       if (new_root->right_ != nullptr)
       {
@@ -80,9 +112,9 @@ namespace spiridonov
       return new_root;
     }
 
-    KV_tnode* rotation_LL(KV_tnode* root_)
+    KV_node * rotation_LL(KV_node * root_)
     {
-      KV_tnode* new_root = root_->right_;
+      KV_node * new_root = root_->right_;
       root_->right_ = new_root->left_;
       if (new_root->left_ != nullptr)
       {
@@ -94,27 +126,27 @@ namespace spiridonov
       return new_root;
     }
 
-    KV_tnode* rotation_LR(KV_tnode* root_)
+    KV_node * rotation_LR(KV_node * root_)
     {
       root_->left_ = rotation_LL(root_->left_);
       return rotation_RR(root_);
     }
 
-    KV_tnode* rotation_RL(KV_tnode* root_)
+    KV_node * rotation_RL(KV_node * root_)
     {
       root_->right_ = rotation_RR(root_->right_);
       return rotation_LL(root_);
     }
 
-    KV_tnode* insert(KV_tnode* root_, const Key& key_, const Value& value_)
+    KV_node * insert(KV_node * root_, const Key & key, const Value & value)
     {
       if (root_ == nullptr)
       {
-        KVC_AVLtree* new_node = nullptr;
+        KV_node * new_node = nullptr;
         try
         {
-          new_node = new KVC_AVLtree;
-          new_node->data_ = std::make_pair(key_, value_);
+          new_node = new KV_node;
+          new_node->data_ = std::make_pair(key, value);
           new_node->left_ = nullptr;
           new_node->right_ = nullptr;
           new_node->parent_ = nullptr;
@@ -124,76 +156,78 @@ namespace spiridonov
           delete new_node;
           throw;
         }
+        ++size_;
         return new_node;
       }
-      else if (comp_(key_, root_->data_.first))
+      else if (comp_(key, root_->data_.first))
       {
-        root_->left_ = insert(root_->left_, key_, value_);
+        root_->left_ = insert(root_->left_, key, value);
         root_->left_->parent_ = root_;
       }
-      else if (comp_(root_->data_.first, key_))
+      else if (comp_(root_->data_.first, key))
       {
-        root_->right_ = insert(root_->right_, key_, value_);
+        root_->right_ = insert(root_->right_, key, value);
         root_->right_->parent_ = root_;
       }
       else
       {
-        root_->data_.second = value_;
+        root_->data_.second = value;
+        return root_;
       }
       return balance(root_);
     }
 
-    KVC_AVLtree* search(KVC_AVLtree* root_, const Key& key_)
+    KV_node * search(KV_node * root_, const Key & key)
     {
-      if (root_ == nullptr || root_->data_.first == key_)
+      if (root_ == nullptr || root_->data_.first == key)
       {
         return root_;
       }
-      if (comp_(key_, root_->data_.first))
+      if (comp_(key, root_->data_.first))
       {
-        return search(root_->left_, key_);
+        return search(root_->left_, key);
       }
-      return search(root_->right_, key_);
+      return search(root_->right_, key);
     }
 
-    KVC_AVLtree* erase(KVC_AVLtree* root_, const Key& key_)
+    KV_node * erase(KV_node * root_, const Key & key)
     {
       if (root_ == nullptr)
       {
         return root_;
       }
 
-      if (comp_(key_, root_->data_.first))
+      if (comp_(key, root_->data_.first))
       {
-        root_->left_ = erase(root_->left_, key_);
+        root_->left_ = erase(root_->left_, key);
       }
-      else if (comp_(root_->data_.first, key_))
+      else if (comp_(root_->data_.first, key))
       {
-        root_->right_ = erase(root_->right_, key_);
+        root_->right_ = erase(root_->right_, key);
       }
       else
       {
         if (root_->left_ == nullptr)
         {
-          KVC_AVLtree* temp = root_->right_;
+          KV_node * temp = root_->right_;
           delete root_;
           return temp;
         }
         else if (root_->right_ == nullptr)
         {
-          KVC_AVLtree* temp = root_->left_;
+          KV_node * temp = root_->left_;
           delete root_;
           return temp;
         }
 
-        KVC_AVLtree* temp = leftmost(root_->right_);
+        KV_node * temp = leftmost(root_->right_);
         root_->data_ = temp->data_;
         root_->right_ = erase(root_->right_, temp->data_.first);
       }
       return balance(root_);
     }
 
-    int height(KV_tnode* node)
+    int height(KV_node * node)
     {
       if (node == nullptr)
       {
@@ -204,7 +238,7 @@ namespace spiridonov
       return std::max(left_height, right_height) + 1;
     }
 
-    KVC_AVLtree* balance(KVC_AVLtree* root_)
+    KV_node * balance(KV_node * root_)
     {
       if (root_ == nullptr)
       {
@@ -235,6 +269,19 @@ namespace spiridonov
         return rotation_RL(root_);
       }
       return root_;
+    }
+
+    KV_node * leftmost(KV_node * node) const
+    {
+      if (node == nullptr)
+      {
+        return nullptr;
+      }
+      while (node->left_ != nullptr)
+      {
+        node = node->left_;
+      }
+      return node;
     }
   };
 }

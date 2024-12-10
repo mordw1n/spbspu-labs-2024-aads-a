@@ -1,5 +1,5 @@
-#ifndef TREENODE_H
-#define TREENODE_H
+#ifndef TREENODE_HPP
+#define TREENODE_HPP
 
 #include <utility>
 
@@ -7,29 +7,30 @@ namespace spiridonov
 {
   namespace detail
   {
-    template < class Key, class Value >
-
+    template<class Key, class Value>
     struct TNode
     {
-      using KV_node = TNode< Key, Value >;
-
-      std::pair< Key, Value > data_;
-      KV_node *parent_;
-      KV_node *left_;
-      KV_node *right_;
+      std::pair<Key, Value> data_;
+      TNode* left_;
+      TNode* right_;
+      TNode* parent_;
       int height_;
 
-      TNode(Key key_, Value value_, KV_node *parent = nullptr):
-        data_(key_, value_),
-        parent_(parent),
+      TNode():
+        data_(Key(), Value()),
         left_(nullptr),
         right_(nullptr),
+        parent_(nullptr),
         height_(0)
       {}
 
-      ~TNode()
+      TNode(const Key& key, const Value& value):
+        data_(std::make_pair(key, value)),
+        left_(nullptr),
+        right_(nullptr),
+        parent_(nullptr),
+        height_(1)
       {}
-
     };
   }
 }
