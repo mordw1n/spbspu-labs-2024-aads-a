@@ -30,24 +30,24 @@ namespace spiridonov
     {}
     ~IterT() = default;
 
-    IterT(const iter &) = default;
-    iter & operator=(const iter &) = default;
-    IterT(iter && other) noexcept = default;
-    iter & operator=(iter && other) noexcept = default;
+    IterT(const iter&) = default;
+    iter& operator=(const iter&) = default;
+    IterT(iter&& other) noexcept = default;
+    iter& operator=(iter&& other) noexcept = default;
 
-    const KV_pair & operator*() const
+    const KV_pair& operator*() const
     {
       assert(node_ptr_ != nullptr);
       return node_ptr_->data_;
     }
 
-    const KV_pair * operator->() const
+    const KV_pair* operator->() const
     {
       assert(node_ptr_ != nullptr);
       return std::addressof(node_ptr_->data_);
     }
 
-    iter & operator++()
+    iter& operator++()
     {
       assert(node_ptr_ != nullptr);
       if (node_ptr_->right_)
@@ -69,7 +69,7 @@ namespace spiridonov
       return *this;
     }
 
-    iter & operator++(int)
+    iter& operator++(int)
     {
       assert(node_ptr_ != nullptr);
       iter temp = *this;
@@ -77,7 +77,7 @@ namespace spiridonov
       return temp;
     }
 
-    iter & operator--()
+    iter& operator--()
     {
       assert(node_ptr_ != nullptr);
       if (node_ptr_->left_)
@@ -99,7 +99,7 @@ namespace spiridonov
       return *this;
     }
 
-    iter & operator--(int)
+    iter& operator--(int)
     {
       assert(node_ptr_ != nullptr);
       iter temp = *this;
@@ -107,29 +107,29 @@ namespace spiridonov
       return temp;
     }
 
-    bool operator==(const iter & other) const
+    bool operator==(const iter& other) const
     {
       return node_ptr_ == other.node_ptr_;
     }
 
-    bool operator==(const_iter & other) const
+    bool operator==(const_iter& other) const
     {
       return node_ptr_ == other.node_ptr_;
     }
 
-    bool operator!=(const iter & other) const
+    bool operator!=(const iter& other) const
     {
       return node_ptr_ != other.node_ptr_;
     }
 
-    bool operator!=(const_iter & other) const
+    bool operator!=(const_iter& other) const
     {
       return node_ptr_ != other.node_ptr_;
     }
 
   private:
-    KV_node * node_ptr_;
-    explicit IterT(KV_node * node):
+    KV_node* node_ptr_;
+    explicit IterT(KV_node* node):
       node_ptr_(node)
     {}
   };

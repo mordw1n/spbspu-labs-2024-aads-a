@@ -18,7 +18,7 @@ namespace spiridonov
     using iter = IterT< Key, Value, Compare >;
     using const_iter = ConstIterT< Key, Value, Compare >;
 
-    KV_node * root_;
+    KV_node* root_;
     size_t size_;
 
     AVLtree():
@@ -26,7 +26,7 @@ namespace spiridonov
       size_(0)
     {}
 
-    AVLtree(const AVLtree & other):
+    AVLtree(const AVLtree& other):
       root_(nullptr),
       size_(0)
     {
@@ -44,14 +44,14 @@ namespace spiridonov
       }
     }
 
-    AVLtree(AVLtree && other) noexcept:
+    AVLtree(AVLtree&& other) noexcept:
       root_(other.root_)
     {
       other.root_ = nullptr;
       other.size_ = 0;
     }
 
-    AVLtree & operator=(const AVLtree & other)
+    AVLtree& operator=(const AVLtree& other)
     {
       if (this != &other)
       {
@@ -73,7 +73,7 @@ namespace spiridonov
       return *this;
     }
 
-    AVLtree & operator=(AVLtree && other) noexcept
+    AVLtree& operator=(AVLtree&& other) noexcept
     {
       if (this != &other)
       {
@@ -96,7 +96,7 @@ namespace spiridonov
       root_ = insert(root_, key, value);
     }
 
-    KV_node * erase(const Key& key)
+    KV_node* erase(const Key& key)
     {
       root_ = erase(root_, key);
       return root_;
@@ -134,9 +134,9 @@ namespace spiridonov
       size_ = 0;
     }
 
-    KV_node * rotation_RR(KV_node * root_)
+    KV_node* rotation_RR(KV_node* root_)
     {
-      KV_node * new_root = root_->left_;
+      KV_node* new_root = root_->left_;
       root_->left_ = new_root->right_;
       if (new_root->right_ != nullptr)
       {
@@ -148,9 +148,9 @@ namespace spiridonov
       return new_root;
     }
 
-    KV_node * rotation_LL(KV_node * root_)
+    KV_node* rotation_LL(KV_node* root_)
     {
-      KV_node * new_root = root_->right_;
+      KV_node* new_root = root_->right_;
       root_->right_ = new_root->left_;
       if (new_root->left_ != nullptr)
       {
@@ -162,23 +162,23 @@ namespace spiridonov
       return new_root;
     }
 
-    KV_node * rotation_LR(KV_node * root_)
+    KV_node* rotation_LR(KV_node* root_)
     {
       root_->left_ = rotation_LL(root_->left_);
       return rotation_RR(root_);
     }
 
-    KV_node * rotation_RL(KV_node * root_)
+    KV_node* rotation_RL(KV_node* root_)
     {
       root_->right_ = rotation_RR(root_->right_);
       return rotation_LL(root_);
     }
 
-    KV_node * insert(KV_node * root_, const Key & key, const Value & value)
+    KV_node* insert(KV_node* root_, const Key& key, const Value& value)
     {
       if (root_ == nullptr)
       {
-        KV_node * new_node = nullptr;
+        KV_node* new_node = nullptr;
         try
         {
           new_node = new KV_node;
@@ -213,7 +213,7 @@ namespace spiridonov
       return balance(root_);
     }
 
-    KV_node * search(KV_node * root_, const Key & key)
+    KV_node* search(KV_node* root_, const Key& key)
     {
       if (root_ == nullptr || root_->data_.first == key)
       {
@@ -226,7 +226,7 @@ namespace spiridonov
       return search(root_->right_, key);
     }
 
-    KV_node * erase(KV_node * root_, const Key & key)
+    KV_node* erase(KV_node* root_, const Key& key)
     {
       if (root_ == nullptr)
       {
@@ -245,25 +245,25 @@ namespace spiridonov
       {
         if (root_->left_ == nullptr)
         {
-          KV_node * temp = root_->right_;
+          KV_node* temp = root_->right_;
           delete root_;
           return temp;
         }
         else if (root_->right_ == nullptr)
         {
-          KV_node * temp = root_->left_;
+          KV_node* temp = root_->left_;
           delete root_;
           return temp;
         }
 
-        KV_node * temp = leftmost(root_->right_);
+        KV_node* temp = leftmost(root_->right_);
         root_->data_ = temp->data_;
         root_->right_ = erase(root_->right_, temp->data_.first);
       }
       return balance(root_);
     }
 
-    int height(KV_node * node)
+    int height(KV_node* node)
     {
       if (node == nullptr)
       {
@@ -274,7 +274,7 @@ namespace spiridonov
       return std::max(left_height, right_height) + 1;
     }
 
-    KV_node * balance(KV_node * root_)
+    KV_node* balance(KV_node* root_)
     {
       if (root_ == nullptr)
       {
@@ -307,7 +307,7 @@ namespace spiridonov
       return root_;
     }
 
-    KV_node * leftmost(KV_node * node) const
+    KV_node* leftmost(KV_node* node) const
     {
       if (node == nullptr)
       {
