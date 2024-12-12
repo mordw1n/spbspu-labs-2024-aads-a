@@ -215,15 +215,15 @@ namespace spiridonov
 
     KV_node* search(KV_node* root_, const Key& key)
     {
-      if (root_ == nullptr || root_->data_.first == key)
+      while (root_ != nullptr)
       {
-        return root_;
+        if (root_->data_.first == key)
+        {
+          return root_;
+        }
+        root_ = comp_(key, root_->data_.first) ? root_->left_ : root_->right_;
       }
-      if (comp_(key, root_->data_.first))
-      {
-        return search(root_->left_, key);
-      }
-      return search(root_->right_, key);
+      return nullptr;
     }
 
     KV_node* erase(KV_node* root_, const Key& key)
@@ -269,9 +269,7 @@ namespace spiridonov
       {
         return 0;
       }
-      int left_height = height(node->left_);
-      int right_height = height(node->right_);
-      return std::max(left_height, right_height) + 1;
+      return std::max(height(node->left_), height(node->right_)) + 1;
     }
 
     KV_node* balance(KV_node* root_)
@@ -285,24 +283,27 @@ namespace spiridonov
       int right_height = height(root_->right_);
       int balance_factor = left_height - right_height;
 
-      if (balance_factor > 1 && height(root_->left_->left_) >= height(root_->left_->right_))
+      if (balance_factor > 1)
       {
-        return rotation_RR(root_);
+        if (height(root_->left_->left_) >= height(root_->left_->right_))
+        {
+          return rotation_RR(root_);
+        }
+        else
+        {
+          return rotation_LR(root_);
+        }
       }
-
-      if (balance_factor > 1 && height(root_->left_->left_) < height(root_->left_->right_))
+      else if (balance_factor < -1)
       {
-        return rotation_LR(root_);
-      }
-
-      if (balance_factor < -1 && height(root_->right_->right_) >= height(root_->right_->left_))
-      {
-        return rotation_LL(root_);
-      }
-
-      if (balance_factor < -1 && height(root_->right_->right_) < height(root_->right_->left_))
-      {
-        return rotation_RL(root_);
+        if (height(root_->right_->right_) >= height(root_->right_->left_))
+        {
+          return rotation_LL(root_);
+        }
+        else
+        {
+          return rotation_RL(root_);
+        }
       }
       return root_;
     }
