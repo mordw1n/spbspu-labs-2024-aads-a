@@ -28,3 +28,4 @@ int main(int argc, char* argv[])
   }
   process_commands(dictionaries);
 }
+

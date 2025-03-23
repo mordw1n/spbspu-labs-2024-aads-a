@@ -102,7 +102,6 @@ namespace spiridonov
       return node_->data_.second;
     }
 
-
     const Value& operator[](const Key& key) const
     {
       KV_node* node_ = search(root_, key);
@@ -504,3 +503,4 @@ namespace spiridonov
 }
 
 #endif
+
