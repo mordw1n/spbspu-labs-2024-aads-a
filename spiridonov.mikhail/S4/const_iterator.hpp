@@ -1,6 +1,7 @@
 #ifndef CONST_ITERATOR_HPP
 #define CONST_ITERATOR_HPP
 
+#include <iterator>
 #include "t_node.hpp"
 #include "iterator.hpp"
 
@@ -23,7 +24,7 @@ namespace spiridonov
     using KV_node = detail::TNode< Key, Value >;
 
   public:
-    ConstIterT():
+    ConstIterT() :
       node_ptr_(nullptr)
     {}
     ~ConstIterT() = default;
@@ -67,10 +68,10 @@ namespace spiridonov
       return *this;
     }
 
-    const_iter& operator++(int)
+    const_iter operator++(int)
     {
       assert(node_ptr_ != nullptr);
-      iter temp = *this;
+      const_iter temp = *this;
       ++(*this);
       return temp;
     }

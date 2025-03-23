@@ -1,6 +1,7 @@
 #ifndef ITERATOR_HPP
 #define ITERATOR_HPP
 
+#include <iterator>
 #include <functional>
 #include <cassert>
 #include "t_node.hpp"
@@ -25,7 +26,7 @@ namespace spiridonov
     using KV_node = detail::TNode< Key, Value >;
 
   public:
-    IterT():
+    IterT() :
       node_ptr_(nullptr)
     {}
     ~IterT() = default;

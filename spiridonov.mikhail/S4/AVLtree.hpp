@@ -27,8 +27,7 @@ namespace spiridonov
     {}
 
     AVLtree(const AVLtree& other):
-      root_(nullptr),
-      size_(0)
+      AVLtree()
     {
       try
       {
@@ -45,10 +44,16 @@ namespace spiridonov
     }
 
     AVLtree(AVLtree&& other) noexcept:
+      size_(0),
       root_(other.root_)
     {
       other.root_ = nullptr;
       other.size_ = 0;
+    }
+
+    ~AVLtree()
+    {
+      clear();
     }
 
     AVLtree& operator=(const AVLtree& other)
@@ -86,9 +91,128 @@ namespace spiridonov
       return *this;
     }
 
-    ~AVLtree()
+    Value& operator[](const Key& key)
     {
-      clear();
+      KV_node* node_ = search(root_, key);
+      if (!node_)
+      {
+        root_ = insert(root_, key, Value());
+        node_ = search(root_, key);
+      }
+      return node_->data_.second;
+    }
+
+
+    const Value& operator[](const Key& key) const
+    {
+      KV_node* node_ = search(root_, key);
+      if (node_)
+      {
+        return node_->data_.second;
+      }
+      else
+      {
+        throw std::out_of_range("There is no key");
+      }
+    }
+
+    Value& at(const Key& key)
+    {
+      KV_node* node_ = get_root(root_, key);
+      if (node_)
+      {
+        return node_->data_.second;
+      }
+      else
+      {
+        throw std::out_of_range("Key not found");
+      }
+    }
+
+    const Value& at(const Key& key) const
+    {
+      KV_node* node_ = get_root(root_, key);
+      if (node_)
+      {
+        return node_->data_.second;
+      }
+      else
+      {
+        throw std::out_of_range("Key not found");
+      }
+    }
+
+    void swap(AVLtree& other) noexcept
+    {
+      static_assert(std::is_nothrow_copy_constructible< Compare >::value);
+      std::swap(root_, other.root_);
+      std::swap(size_, other.size_);
+      std::swap(comp_, other.comp_);
+    }
+
+    void push_cmd(const Key& key, const Value& value)
+    {
+      root_ = insert(root_, key, value);
+      ++size_;
+    }
+
+    iter find(const Key& key)
+    {
+      KV_node* current = root_;
+      while (current)
+      {
+        if (current->data_.first == key)
+        {
+          return iter(current);
+        }
+        else if (comp_(current->data_.first, key))
+        {
+          current = current->right_;
+        }
+        else
+        {
+          current = current->left_;
+        }
+      }
+      return end();
+    }
+
+    const_iter find(const Key& key) const
+    {
+      KV_node* current = root_;
+      while (current)
+      {
+        if (current->data_.first == key)
+        {
+          return const_iter(current);
+        }
+        else if (comp_(current->data_.first, key))
+        {
+          current = current->right_;
+        }
+        else
+        {
+          current = current->left_;
+        }
+      }
+      return cend();
+    }
+
+    std::pair< iter, iter > equal_range(const Key& key)
+    {
+      iter it = find(key);
+      if (it == end())
+      {
+        return std::make_pair(end(), end());
+      }
+      iter next = it;
+      ++next;
+      return std::make_pair(it, next);
+    }
+
+    size_t size(KV_node* node_)
+    {
+      return (node_ == nullptr) ? 0 : node_->size_;
     }
 
     void insert(const Key& key, const Value value)
@@ -120,6 +244,55 @@ namespace spiridonov
     const_iter cend() const
     {
       return const_iter(nullptr);
+    }
+
+    bool empty() const noexcept
+    {
+      return size_ == 0;
+    }
+
+    bool contains(const Key& key) const
+    {
+      return get_root(root_, key) != nullptr;
+    }
+
+    KV_node* insert(KV_node* root_, const Key& key, const Value& value)
+    {
+      if (root_ == nullptr)
+      {
+        KV_node* new_node = nullptr;
+        try
+        {
+          new_node = new KV_node;
+          new_node->data_ = std::make_pair(key, value);
+          new_node->left_ = nullptr;
+          new_node->right_ = nullptr;
+          new_node->parent_ = nullptr;
+        }
+        catch (...)
+        {
+          delete new_node;
+          throw;
+        }
+        ++size_;
+        return new_node;
+      }
+      else if (comp_(key, root_->data_.first))
+      {
+        root_->left_ = insert(root_->left_, key, value);
+        root_->left_->parent_ = root_;
+      }
+      else if (comp_(root_->data_.first, key))
+      {
+        root_->right_ = insert(root_->right_, key, value);
+        root_->right_->parent_ = root_;
+      }
+      else
+      {
+        root_->data_.second = value;
+        return root_;
+      }
+      return balance(root_);
     }
 
   private:
@@ -174,43 +347,48 @@ namespace spiridonov
       return rotation_LL(root_);
     }
 
-    KV_node* insert(KV_node* root_, const Key& key, const Value& value)
+    const Value& get_root(const Key& key) const
     {
-      if (root_ == nullptr)
+      KV_node* val = get_root(key, root_);
+      return val->data_.second;
+    }
+
+    KV_node* get_root(KV_node* node_, const Key& key) const
+    {
+      if (node_ == nullptr || (!comp_(key, node_->data_.first) && !comp_(node_->data_.first, key)))
       {
-        KV_node* new_node = nullptr;
-        try
-        {
-          new_node = new KV_node;
-          new_node->data_ = std::make_pair(key, value);
-          new_node->left_ = nullptr;
-          new_node->right_ = nullptr;
-          new_node->parent_ = nullptr;
-        }
-        catch (...)
-        {
-          delete new_node;
-          throw;
-        }
-        ++size_;
-        return new_node;
+        return node_;
       }
-      else if (comp_(key, root_->data_.first))
+      if (comp_(key, node_->data_.first))
       {
-        root_->left_ = insert(root_->left_, key, value);
-        root_->left_->parent_ = root_;
-      }
-      else if (comp_(root_->data_.first, key))
-      {
-        root_->right_ = insert(root_->right_, key, value);
-        root_->right_->parent_ = root_;
+        return get_root(node_->left_, key);
       }
       else
       {
-        root_->data_.second = value;
-        return root_;
+        return get_root(node_->right_, key);
       }
-      return balance(root_);
+    }
+
+    Value& get_root(const Key& key)
+    {
+      KV_node* val = get_root(key, root_);
+      return val->data_.second;
+    }
+
+    KV_node* get_root(KV_node* node_, const Key& key)
+    {
+      if (node_ == nullptr || node_->data_.first == key)
+      {
+        return node_;
+      }
+      if (comp_(key, node_->data_.first))
+      {
+        return get_root(node_->left_, key);
+      }
+      else
+      {
+        return get_root(node_->right_, key);
+      }
     }
 
     KV_node* search(KV_node* root_, const Key& key)
@@ -247,12 +425,14 @@ namespace spiridonov
         {
           KV_node* temp = root_->right_;
           delete root_;
+          --size_;
           return temp;
         }
         else if (root_->right_ == nullptr)
         {
           KV_node* temp = root_->left_;
           delete root_;
+          --size_;
           return temp;
         }
 
@@ -263,13 +443,13 @@ namespace spiridonov
       return balance(root_);
     }
 
-    int height(KV_node* node)
+    int height(KV_node* node_)
     {
-      if (node == nullptr)
+      if (node_ == nullptr)
       {
         return 0;
       }
-      return std::max(height(node->left_), height(node->right_)) + 1;
+      return std::max(height(node_->left_), height(node_->right_)) + 1;
     }
 
     KV_node* balance(KV_node* root_)
@@ -308,17 +488,17 @@ namespace spiridonov
       return root_;
     }
 
-    KV_node* leftmost(KV_node* node) const
+    KV_node* leftmost(KV_node* node_) const
     {
-      if (node == nullptr)
+      if (node_ == nullptr)
       {
         return nullptr;
       }
-      while (node->left_ != nullptr)
+      while (node_->left_ != nullptr)
       {
-        node = node->left_;
+        node_ = node_->left_;
       }
-      return node;
+      return node_;
     }
   };
 }

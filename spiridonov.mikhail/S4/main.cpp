@@ -7,7 +7,7 @@
 int main(int argc, char* argv[])
 {
   using namespace spiridonov;
-  dict dictionaries;
+  AVLtree< std::string, AVLtree< int, std::string > > dictionaries;
   if (argc == 2)
   {
     std::ifstream file(argv[1]);
@@ -20,12 +20,11 @@ int main(int argc, char* argv[])
       std::cerr << "Error to open file\n";
       return 1;
     }
-
   }
   else
   {
     std::cerr << "File not found\n";
     return 1;
   }
-  commands(std::cin, std::cout, dictionaries);
+  process_commands(dictionaries);
 }
