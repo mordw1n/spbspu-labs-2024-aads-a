@@ -24,7 +24,7 @@ namespace spiridonov
     using KV_node = detail::TNode< Key, Value >;
 
   public:
-    ConstIterT() :
+    ConstIterT():
       node_ptr_(nullptr)
     {}
     ~ConstIterT() = default;
