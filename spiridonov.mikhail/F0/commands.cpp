@@ -59,7 +59,7 @@ void spiridonov::intersect_dict(std::istream& in, AVLtree< std::string, AVLtree<
 {
   std::string new_name, first_name, second_name;
   in >> new_name >> first_name >> second_name;
-  
+
   const auto& first = dicts.at(first_name);
   const auto& second = dicts.at(second_name);
   AVLtree<int, std::string> res;
