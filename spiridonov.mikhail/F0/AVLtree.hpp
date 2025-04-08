@@ -9,7 +9,7 @@
 
 namespace spiridonov
 {
-  template< class Key, class Value, class Compare = std::less< Key > >
+  template< typename Key, typename Value, typename Compare = std::less< Key > >
   class AVLtree
   {
   public:
@@ -198,6 +198,52 @@ namespace spiridonov
       return cend();
     }
 
+    iter find_value(const Value& value)
+    {
+      return find_value(root_, value);
+    }
+
+    const_iter find_value(const Value& value) const
+    {
+      return find_value(root_, value);
+    }
+
+    iter find_value(KV_node* node, const Value& value)
+    {
+      if (!node)
+      {
+        return end();
+      }
+      if (node->data_.second == value)
+      {
+        return iter(node);
+      }
+      iter left_result = find_value(node->left_, value);
+      if (left_result != end())
+      {
+        return left_result;
+      }
+      return find_value(node->right_, value);
+    }
+
+    const_iter find_value(KV_node* node, const Value& value) const
+    {
+      if (!node)
+      {
+        return cend();
+      }
+      if (node->data_.second == value)
+      {
+        return const_iter(node);
+      }
+      const_iter left_result = find_value(node->left_, value);
+      if (left_result != cend())
+      {
+        return left_result;
+      }
+      return find_value(node->right_, value);
+    }
+
     std::pair< iter, iter > equal_range(const Key& key)
     {
       iter it = find(key);
@@ -206,6 +252,18 @@ namespace spiridonov
         return std::make_pair(end(), end());
       }
       iter next = it;
+      ++next;
+      return std::make_pair(it, next);
+    }
+
+    std::pair< const_iter, const_iter > equal_range(const Key& key) const
+    {
+      const_iter it = find(key);
+      if (it == cend())
+      {
+        return std::make_pair(cend(), cend());
+      }
+      const_iter next = it;
       ++next;
       return std::make_pair(it, next);
     }

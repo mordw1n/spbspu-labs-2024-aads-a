@@ -1,56 +1,38 @@
-#include "input_processing.hpp"
-#include <limits>
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <functional>
 #include <stdexcept>
+#include <limits>
+#include "commands.hpp"
 
 namespace spiridonov
 {
-  void read_dict(std::ifstream& in, AVLtree<std::string, AVLtree<int, std::string>>& dictionaries)
-  {
-    std::string data = "";
-    std::string value = "";
-    int key = 0;
-
-    while (in >> data)
-    {
-      AVLtree< int, std::string > dict;
-      if (in.get() == '\n')
-      {
-        dictionaries.insert(data, dict);
-        continue;
-      }
-      while (in >> key >> value)
-      {
-        dict.insert(key, value);
-        if (in.get() == '\n')
-        {
-          break;
-        }
-      }
-      dictionaries.insert(data, dict);
-    }
-  }
-
-  AVLtree<std::string, std::function<void(std::istream&, AVLtree<std::string, AVLtree<int, std::string>>&)> > cmds;
-  void process_commands(AVLtree<std::string, AVLtree<int, std::string>>& dictionary)
+  void process_commands(mainDictsTree& dictionaries)
   {
     using namespace std::placeholders;
 
-    cmds["print"] = std::bind(print_dict, _1, _2, std::ref(std::cout));
-    cmds["create"] = std::bind(create_dict, _1, _2);
-    //cmds["complement"] = std::bind(complement_dict, _1, _2);
-    cmds["intersect"] = std::bind(intersect_dict, _1, _2);
-    cmds["union"] = std::bind(union_dict, _1, _2);
+    AVLtree< std::string, std::function< void(std::istream&, mainDictsTree&) > > cmds;
+    cmds.insert("create", std::bind(create_dict, _1, _2));
+    cmds.insert("load", std::bind(load_dict, _1, _2));
+    cmds.insert("add_word", std::bind(add_word, _1, _2));
+    cmds.insert("remove_word", std::bind(remove_word, _1, _2));
+    cmds.insert("find", std::bind(find_freq, _1, _2));
+    cmds.insert("display", std::bind(display_dict, _1, _2, std::ref(std::cout)));
+    cmds.insert("merge", std::bind(merge_dicts, _1, _2));
+    cmds.insert("save", std::bind(save_to_file, _1, _2));
+    cmds.insert("compare", std::bind(compare_dicts, _1, _2));
+    cmds.insert("intersect", std::bind(intersect_dict, _1, _2));
+    cmds.insert("diff", std::bind(diff_dict, _1, _2));
+    cmds.insert("union", std::bind(union_dict, _1, _2));
+    cmds.insert("dict_ff", std::bind(dict_from_file, _1, _2));
 
-    std::string cmd;
+    std::string cmd = "";
     while (std::cin >> cmd)
     {
       try
       {
-        cmds.at(cmd)(std::cin, dictionary);
+        cmds.at(cmd)(std::cin, dictionaries);
       }
       catch (const std::exception)
       {
@@ -59,23 +41,5 @@ namespace spiridonov
       std::cin.clear();
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
-  }
-
-  void spiridonov::print_dict(std::istream& in, const AVLtree< std::string, AVLtree< int, std::string > >& dicts, std::ostream& out)
-  {
-    std::string in_dict_name = "";
-    in >> in_dict_name;
-    AVLtree< int, std::string > in_dict = dicts.at(in_dict_name);
-    if (in_dict.empty())
-    {
-      out << "<EMPTY>\n";
-      return;
-    }
-    out << in_dict_name;
-    for (auto it = in_dict.cbegin(); it != in_dict.cend(); it++)
-    {
-      out << " " << it->first << " " << it->second;
-    }
-    out << "\n";
   }
 }
