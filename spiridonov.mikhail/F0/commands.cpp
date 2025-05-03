@@ -3,11 +3,12 @@
 
 void spiridonov::create_dict(std::istream& in, mainDictsTree& dicts)
 {
-  std::string name = "";
+  std::string name;
   in >> name;
   if (dicts.contains(name))
   {
-    std::cout << "<NAME IS BUSY>\n";
+    std::cerr << "<NAME IS BUSY>\n";
+    return;
   }
   else
   {
@@ -17,26 +18,28 @@ void spiridonov::create_dict(std::istream& in, mainDictsTree& dicts)
 
 void spiridonov::load_dict(std::istream& in, mainDictsTree& dicts)
 {
-  std::string name = "", filename = "";
+  std::string name, filename, word;
   in >> name >> filename;
+  dicts.insert(name, dictTree());
   std::ifstream file(filename);
-  if (!file.is_open())
+  int freq = 0;
+  while (file >> word >> freq)
   {
-    std::cerr << "<FILE NOT FOUND>\n";
-    return;
-  }
-  dictTree& dict = dicts.at(name);
-  std::string word = " ";
-  int frequency = 0;
-  while (file >> word >> frequency)
-  {
-    dict.insert(frequency, word);
+    dictTree& dict = dicts.at(name);
+    if (dict.contains(word))
+    {
+      dict[word] += freq;
+    }
+    else
+    {
+      dict.insert(word, freq);
+    }
   }
 }
 
 void spiridonov::add_word(std::istream& in, mainDictsTree& dicts)
 {
-  std::string name = "", word = "", frequency_str = "";
+  std::string name, word, frequency_str;
   in >> name >> word >> frequency_str;
   int frequency = 0;
   try
@@ -48,15 +51,30 @@ void spiridonov::add_word(std::istream& in, mainDictsTree& dicts)
     std::cerr << "<BAD VALUE>\n";
     return;
   }
-  dictTree& dict = dicts.at(name);
-  dict.insert(frequency, word);
+  try
+  {
+    dictTree& dict = dicts.at(name);
+    if (dict.contains(word))
+    {
+      dict[word] += frequency;
+    }
+    else
+    {
+      dict.insert(word, frequency);
+    }
+  }
+  catch (const std::out_of_range&)
+  {
+    std::cerr << "<DICTIONARY NOT FOUND>\n";
+  }
 }
+
 void spiridonov::remove_word(std::istream& in, mainDictsTree& dicts)
 {
-  std::string name = "", word = "";
+  std::string name, word;
   in >> name >> word;
   dictTree& dict = dicts.at(name);
-  auto it = dict.find_value(word);
+  auto it = dict.find(word);
   if (it != dict.end())
   {
     dict.erase(it->first);
@@ -69,13 +87,13 @@ void spiridonov::remove_word(std::istream& in, mainDictsTree& dicts)
 
 void spiridonov::find_freq(std::istream& in, mainDictsTree& dicts)
 {
-  std::string name = "", word = "";
+  std::string name, word;
   in >> name >> word;
   const dictTree& dict = dicts.at(name);
-  auto it = dict.find_value(word);
+  auto it = dict.find(word);
   if (it != dict.cend())
   {
-    std::cout << it->first << "\n";
+    std::cout << it->second << "\n";
   }
   else
   {
@@ -83,10 +101,9 @@ void spiridonov::find_freq(std::istream& in, mainDictsTree& dicts)
   }
 }
 
-
 void spiridonov::display_dict(std::istream& in, const mainDictsTree& dicts, std::ostream& out)
 {
-  std::string in_dict_name = "";
+  std::string in_dict_name;
   in >> in_dict_name;
   dictTree in_dict = dicts.at(in_dict_name);
   if (in_dict.empty())
@@ -94,17 +111,16 @@ void spiridonov::display_dict(std::istream& in, const mainDictsTree& dicts, std:
     std::cerr << "<DICTIONARY IS EMPTY>\n";
     return;
   }
-  out << in_dict_name;
+  out << in_dict_name << ":";
   for (auto it = in_dict.cbegin(); it != in_dict.cend(); it++)
   {
-    out << " " << it->first << " " << it->second;
+    out << " " << it->first << " " << it->second << "\n";;
   }
-  out << "\n";
 }
 
 void spiridonov::merge_dicts(std::istream& in, mainDictsTree& dicts)
 {
-  std::string new_name = "", first_name = "", second_name = "";
+  std::string new_name, first_name, second_name;
   in >> new_name >> first_name >> second_name;
   if (!dicts.contains(first_name) || !dicts.contains(second_name) || first_name == second_name)
   {
@@ -123,25 +139,24 @@ void spiridonov::merge_dicts(std::istream& in, mainDictsTree& dicts)
 
 void spiridonov::save_to_file(std::istream& in, mainDictsTree& dicts)
 {
-  std::string name = "", filename = "";
-  in >> name >> filename;
-  if (!dicts.contains(name))
+  std::string name, filename;
+  in >> filename >> name;
+  const dictTree& dict = dicts.at(name);
+  std::ofstream file(filename);
+  if (dict.empty())
   {
     std::cerr << "<DICTIONARY IS EMPTY>\n";
     return;
   }
-  std::ofstream file(filename);
-  const dictTree& dict = dicts.at(name);
   for (auto it = dict.cbegin(); it != dict.cend(); ++it)
   {
-    file << it->second << " " << it->first << "\n";
+    file << it->first << " " << it->second << "\n";
   }
-  file.close();
 }
 
 void spiridonov::compare_dicts(std::istream& in, mainDictsTree& dicts)
 {
-  std::string first_name = "", second_name = "";
+  std::string first_name, second_name;
   in >> first_name >> second_name;
   const dictTree& first = dicts.at(first_name);
   const dictTree& second = dicts.at(second_name);
@@ -163,8 +178,8 @@ void spiridonov::compare_dicts(std::istream& in, mainDictsTree& dicts)
 
 void spiridonov::intersect_dict(std::istream& in, mainDictsTree& dicts)
 {
-  std::string new_name = "", first_name = "", second_name = "";
-  in >> new_name >> first_name >> second_name; 
+  std::string new_name, first_name, second_name;
+  in >> new_name >> first_name >> second_name;
   const auto& first = dicts.at(first_name);
   const auto& second = dicts.at(second_name);
   dictTree res;
@@ -180,7 +195,7 @@ void spiridonov::intersect_dict(std::istream& in, mainDictsTree& dicts)
 
 void spiridonov::diff_dict(std::istream& in, mainDictsTree& dicts)
 {
-  std::string new_name = "", first_name = "", second_name = "";
+  std::string new_name, first_name, second_name;
   in >> new_name >> first_name >> second_name;
   const dictTree& first = dicts.at(first_name);
   const dictTree& second = dicts.at(second_name);
@@ -188,7 +203,7 @@ void spiridonov::diff_dict(std::istream& in, mainDictsTree& dicts)
   for (auto it = first.cbegin(); it != first.cend(); ++it)
   {
     auto range = second.equal_range(it->first);
-    if (range.first->second != it->second)
+    if (range.first == second.cend() || range.first->second != it->second)
     {
       res.insert(it->first, it->second);
     }
@@ -198,33 +213,51 @@ void spiridonov::diff_dict(std::istream& in, mainDictsTree& dicts)
 
 void spiridonov::union_dict(std::istream& in, mainDictsTree& dicts)
 {
-  std::string new_name = "", first_name = "", second_name = "";
+  std::string new_name, first_name, second_name;
   in >> new_name >> first_name >> second_name;
-  const auto& first = dicts.at(first_name);
-  const auto& second = dicts.at(second_name);
-  dictTree res = first;
-  for (auto it = second.cbegin(); it != second.cend(); ++it)
+  try
   {
-    if (!res.contains(it->first))
+    const dictTree& first = dicts.at(first_name);
+    const dictTree& second = dicts.at(second_name);
+
+    dictTree res = first;
+
+    for (auto it = second.cbegin(); it != second.cend(); ++it)
     {
-      res.insert(it->first, it->second);
+      if (res.contains(it->first))
+      {
+        res[it->first] += it->second;
+      }
+      else
+      {
+        res.insert(it->first, it->second);
+      }
     }
+    dicts.push_cmd(new_name, res);
   }
-  dicts.push_cmd(new_name, res);
+  catch (const std::out_of_range&)
+  {
+    std::cerr << "<SOME DICTIONARY NOT FOUND>\n";
+  }
 }
 
 void spiridonov::dict_from_file(std::istream& in, mainDictsTree& dicts)
 {
-  std::string name = "", filename = "";
-  in >> name >> filename;
+  std::string name, filename, word;
+  in >> filename >> name;
+  dicts.insert(name, dictTree());
   std::ifstream file(filename);
-  dictTree res;
-  std::string word = "";
   int freq = 0;
-  while (file >> word >> freq)
+  while (file >> word)
   {
-    res.insert(freq, word);
+    dictTree& dict = dicts.at(name);
+    if (dict.contains(word))
+    {
+      dict[word] += 1;
+    }
+    else
+    {
+      dict.insert(word, 1);
+    }
   }
-  file.close();
-  dicts.push_cmd(name, res);
 }

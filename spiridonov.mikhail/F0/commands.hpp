@@ -8,7 +8,7 @@
 
 namespace spiridonov
 {
-  using dictTree = AVLtree< int, std::string >;
+  using dictTree = AVLtree< std::string, int >;
   using mainDictsTree = AVLtree< std::string, dictTree >;
 
   void create_dict(std::istream& in, mainDictsTree& dicts);
