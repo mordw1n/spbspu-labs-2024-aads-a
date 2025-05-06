@@ -22,6 +22,11 @@ void spiridonov::load_dict(std::istream& in, mainDictsTree& dicts)
   in >> name >> filename;
   dicts.insert(name, dictTree());
   std::ifstream file(filename);
+  if (!file.is_open())
+  {
+    std::cerr << "<FILE NOT FOUND>\n";
+    return;
+  }
   int freq = 0;
   while (file >> word >> freq)
   {
