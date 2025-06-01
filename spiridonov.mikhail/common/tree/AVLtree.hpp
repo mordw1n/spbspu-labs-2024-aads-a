@@ -3,12 +3,13 @@
 
 #include <algorithm>
 #include <iostream>
-#include "t_node.hpp"
-#include "iterator.hpp"
-#include "const_iterator.hpp"
-//#include "tree/t_node.hpp"
-//#include "tree/iterator.hpp"
-//#include "tree/const_iterator.hpp"
+#include "common/tree/t_node.hpp"
+#include "common/tree/t_node.hpp"
+#include "common/tree/iterator.hpp"
+#include "common/tree/const_iterator.hpp"
+#include "common/stack.hpp"
+#include "common/queue.hpp"
+
 
 namespace spiridonov
 {
@@ -118,40 +119,116 @@ namespace spiridonov
       }
     }
 
+    iter beginr() noexcept
+    {
+      return iter(rightmost(root_));
+    }
+
+    const_iter cbeginr() const noexcept
+    {
+      return const_iter(rightmost(root_));
+    }
+
     template < typename F >
     F traverse_lnr(F f)
     {
-
+      if (empty())
+      {
+        throw std::logic_error("<EMPTY>");
+      }
+      for (auto it = begin(); it != end(); ++it)
+      {
+        f(*it);
+      }
+      return f;
     }
 
     template < typename F >
     F traverse_lnr(F f) const
     {
-
+      if (empty())
+      {
+        throw std::logic_error("<EMPTY>");
+      }
+      for (auto it = cbegin(); it != cend(); it++)
+      {
+        f(*it);
+      }
+      return f;
     }
 
     template < typename F >
     F traverse_rnl(F f)
     {
-
+      if (empty())
+      {
+        throw std::logic_error("<EMPTY>");
+      }
+      for (auto it = beginr(); it != end(); --it)
+      {
+        f(*it);
+      }
+      return f;
     }
 
     template < typename F >
     F traverse_rnl(F f) const
     {
-
+      if (empty())
+      {
+        throw std::logic_error("<EMPTY>");
+      }
+      for (auto it = cbeginr(); it != cend(); --it)
+      {
+        f(*it);
+      }
+      return f;
     }
 
     template < typename F >
     F traverse_breadth(F f)
     {
-
+      Queue< KV_node* > queue;
+      if (queue.isEmpty())
+      {
+        throw std::logic_error("<EMPTY>");
+      }
+      Queue< T > tempQueue;
+      while (!queue.isEmpty())
+      {
+        T value = queue.getTop();
+        f(value);
+        queue.pop();
+        tempQueue.push(value);
+      }
+      while (!tempQueue.isEmpty())
+      {
+        queue.push(tempQueue.getTop());
+        tempQueue.pop();
+      }
     }
 
     template < typename F >
     F traverse_breadth(F f) const
     {
-
+      Queue< const KV_node* > queue;
+      if (queue.isEmpty())
+      {
+        throw std::logic_error("<EMPTY>");
+      }
+      Queue< T > tempQueue;
+      while (!queue.isEmpty())
+      {
+        T value = queue.getTop();
+        f(value);
+        queue.pop();
+        tempQueue.push(value);
+      }
+      while (!tempQueue.isEmpty())
+      {
+        queue.push(tempQueue.getTop());
+        tempQueue.pop();
+      }
     }
 
     Value& at(const Key& key)
@@ -547,6 +624,19 @@ namespace spiridonov
       while (node_->left_ != nullptr)
       {
         node_ = node_->left_;
+      }
+      return node_;
+    }
+
+    KV_node* rightmost(KV_node* node_) const
+    {
+      if (node_ == nullptr)
+      {
+        return nullptr;
+      }
+      while (node_->right_ != nullptr)
+      {
+        node_ = node_->right_;
       }
       return node_;
     }
