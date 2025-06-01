@@ -2,8 +2,8 @@
 #define CONST_ITERATOR_HPP
 
 #include <iterator>
-#include "common/tree/t_node.hpp"
-#include "common/tree/iterator.hpp"
+#include "t_node.hpp"
+#include "iterator.hpp"
 
 namespace spiridonov
 {

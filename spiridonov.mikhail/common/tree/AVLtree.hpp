@@ -3,10 +3,9 @@
 
 #include <algorithm>
 #include <iostream>
-#include "common/tree/t_node.hpp"
-#include "common/tree/t_node.hpp"
-#include "common/tree/iterator.hpp"
-#include "common/tree/const_iterator.hpp"
+#include "t_node.hpp"
+#include "iterator.hpp"
+#include "const_iterator.hpp"
 #include "common/stack.hpp"
 #include "common/queue.hpp"
 

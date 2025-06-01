@@ -4,8 +4,8 @@
 #include <iterator>
 #include <functional>
 #include <cassert>
-#include "common/tree/t_node.hpp"
-#include "common/tree/const_iterator.hpp"
+#include "t_node.hpp"
+#include "const_iterator.hpp"
 
 namespace spiridonov
 {

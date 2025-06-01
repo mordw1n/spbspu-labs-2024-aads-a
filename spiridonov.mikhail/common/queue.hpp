@@ -4,7 +4,6 @@
 #include <stdexcept>
 #include <cstddef>
 #include "node.hpp"
-//#include "stack-queue/node.hpp"
 
 namespace spiridonov
 {
