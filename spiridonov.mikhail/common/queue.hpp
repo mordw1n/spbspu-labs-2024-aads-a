@@ -3,7 +3,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <cstddef>
-#include "node.hpp"
+#include "nodeSQ.hpp"
 
 namespace spiridonov
 {

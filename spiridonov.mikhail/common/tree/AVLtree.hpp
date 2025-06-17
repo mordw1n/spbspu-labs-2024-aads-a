@@ -6,9 +6,8 @@
 #include "t_node.hpp"
 #include "iterator.hpp"
 #include "const_iterator.hpp"
-#include "common/stack.hpp"
-#include "common/queue.hpp"
-
+#include "../stack.hpp"
+#include "../queue.hpp"
 
 namespace spiridonov
 {
@@ -192,11 +191,11 @@ namespace spiridonov
       {
         throw std::logic_error("<EMPTY>");
       }
-      Queue< T > tempQueue;
+      Queue< KV_node* > tempQueue;
       while (!queue.isEmpty())
       {
-        T value = queue.getTop();
-        f(value);
+        KV_node* value = queue.getTop();
+        f(value->data_);
         queue.pop();
         tempQueue.push(value);
       }
@@ -205,6 +204,7 @@ namespace spiridonov
         queue.push(tempQueue.getTop());
         tempQueue.pop();
       }
+      return f;
     }
 
     template < typename F >
@@ -215,11 +215,11 @@ namespace spiridonov
       {
         throw std::logic_error("<EMPTY>");
       }
-      Queue< T > tempQueue;
+      Queue< const KV_node* > tempQueue;
       while (!queue.isEmpty())
       {
-        T value = queue.getTop();
-        f(value);
+        KV_node* value = queue.getTop();
+        f(value->data_);
         queue.pop();
         tempQueue.push(value);
       }
@@ -228,6 +228,7 @@ namespace spiridonov
         queue.push(tempQueue.getTop());
         tempQueue.pop();
       }
+      return f;
     }
 
     Value& at(const Key& key)

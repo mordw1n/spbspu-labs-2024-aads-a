@@ -1,5 +1,5 @@
-#ifndef NODE_HPP
-#define NODE_HPP
+#ifndef NODESQ_HPP
+#define NODESQ_HPP
 
 namespace spiridonov
 {
